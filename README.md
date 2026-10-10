@@ -1,43 +1,52 @@
-# Mahalli
+# Mahalli (محلي)
 
-Offline-first Flutter shop management app for a single owner. Arabic and English localization, POS, inventory, customers and debt, returns, expenses, reports, receipts, backup/restore, local PIN, and settings are implemented without a network layer.
+Mahalli is an offline shop management and point-of-sale app for a single store owner. It is built with Flutter for Android and iOS, with an Arabic and English interface. Sales, stock, customer balances, and business records are stored on the device.
 
-## Run
+## Features
 
-The Android and iOS project folders are already present. From the project root:
+- **Sales and checkout:** Search or scan products, build a cart, record cash or customer-debt sales, and review sales history.
+- **Inventory:** Manage products, services, categories, stock levels, stock movements, damage, and low-stock alerts.
+- **Customers and debt:** Track customer balances through a transaction ledger, record payments and adjustments, and view outstanding debt.
+- **Returns and expenses:** Record returns and operating expenses alongside sales activity.
+- **Reports and receipts:** View sales and profit reports, and generate receipts for PDF sharing or printing.
+- **Local tools:** Create and restore file-based backups, protect the app with an optional PIN, and choose language, theme, number digits, and shop currency.
+
+The supported shop currencies are ILS, USD, EUR, and JOD. JOD amounts use three decimal places.
+
+## Getting started
+
+Install Flutter with a Dart SDK compatible with `pubspec.yaml` (Dart 3.11.1 or newer within the 3.x range), plus the Android or iOS tooling for your target device. From the repository root:
 
 ```sh
 flutter pub get
-dart run build_runner build
 flutter gen-l10n
-dart run tool/check_offline.dart
-flutter analyze
-flutter test
+dart run build_runner build
 flutter run
 ```
 
-On first launch, enter a shop name, business type, and currency. The current choices are ILS, USD, EUR, and JOD; JOD uses three decimal places. The shop is stored in Isar and onboarding is skipped on later launches. Test persistence on an Android or iOS device; the Windows host does not include Isar's native DLL.
+On first launch, enter a shop name, business type, and currency. Mahalli saves the shop locally and opens it directly on later launches. Use an Android or iOS device to check persisted data and device features such as barcode scanning, file backup, and printing.
 
-## Current architecture
+## Development checks
 
-- `lib/core/database`: one local Isar database and transaction runner.
-- `lib/core/config/theme`: light and dark themes based on `DESIGN.md`.
-- `lib/core/config/locale/l10n`: Arabic and English ARB files.
-- `lib/features/onboarding`: validation, repository, Cubit, and UI.
-- `lib/features/security`: optional local PIN, salted PBKDF2 hash in secure storage, lockout, and a five-minute background lock.
-- `lib/features/home`: local daily sales, profit, debt, and low-stock dashboard with refresh on Home return and at midnight.
-- `lib/features/categories`: product and service category lists, add/edit, duplicate-name validation, and activation controls.
-- `lib/features/catalog`: paged local product/service search, barcode scanning and lookup, forms, details, activation controls, and atomic opening-stock movements.
-- `lib/features/stock`: stock status filters, movement history, additions, counted-stock adjustments, and damage records. Every change updates the product and adds a movement in one transaction.
-- `lib/features/customers`: customer list and forms, debt history, payments, adjustments, and an outstanding-debt overview. Balances are derived from immutable signed ledger entries. Overpayments are rejected; deactivation with debt requires confirmation.
-- `lib/features/sales`, `returns`, `expenses`, `reports`, and `receipts`: local POS checkout, atomic stock/debt effects, returns, expenses, profit reports, and saved receipt output.
-- `lib/features/backup`: local backup creation and validation before a guarded restore.
-- `lib/features/settings`: shop editing, language, light/dark theme, number digits, PIN, backup, receipt, report, and About entry points.
+```sh
+dart run tool/check_offline.dart
+flutter analyze
+flutter test
+```
 
-The Inventory tab contains the catalog and opens category and stock management. Customers and expenses are in More; app preferences and utility entry points are consolidated under Settings. Camera scanning, printer output, Isar transactions, and restore recovery must still be checked on Android and iOS devices.
+The offline check enforces the project's network-package and platform-permission policy. CI also checks formatting and localization generation; see [the workflow](.github/workflows/quality.yml).
 
-## Quality and release
+## Project structure
 
-The Android release manifest has no `INTERNET` permission, disables Android automatic backup and clear-text traffic, and the offline policy check rejects common network/Firebase packages. CI runs format, localization generation, the offline check, analysis, and tests. See [the QA/release checklist](docs/QA_RELEASE_CHECKLIST.md) for the required physical-device and store-release steps.
+- `lib/core/` contains routing, localization, theme, money helpers, dependency registration, and the local database.
+- `lib/features/` groups each business feature's UI, domain rules, and data access.
+- `test/` contains feature and workflow tests.
+- `docs/QA_RELEASE_CHECKLIST.md` lists the device checks needed before release.
 
-The current Android and iOS IDs are `com.example.mahalli` until final release identifiers are supplied. Store release requires owner-provided signing credentials and must not use the debug signing configuration. Cairo is named in the theme, but its font asset has not yet been bundled. PIN recovery is not available; after a forgotten PIN, business data must be restored from a backup.
+The app uses Cubit for much of its state management, GetIt for dependency registration, and Isar for local business data. Preferences and PIN material use separate device storage. See [ARCHITECTURE.md](ARCHITECTURE.md) for the current data flow and implementation details.
+
+## Data and release notes
+
+Mahalli has no cloud sync or account system. Business data stays on the device unless the owner exports a backup or shares a receipt. Keep backup files somewhere safe, especially before changing devices or reinstalling the app. There is no PIN recovery flow; restoring business data after a forgotten PIN requires a backup.
+
+The Android release manifest does not request internet access. Before publishing, complete the [QA and release checklist](docs/QA_RELEASE_CHECKLIST.md), including physical-device checks, final app identifiers, and signing configuration. The current app identifiers are placeholders (`com.example.mahalli`).
