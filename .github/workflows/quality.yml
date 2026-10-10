@@ -1,0 +1,21 @@
+name: Quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter gen-l10n
+      - run: dart format --output=none --set-exit-if-changed lib test tool
+      - run: dart run tool/check_offline.dart
+      - run: flutter analyze
+      - run: flutter test

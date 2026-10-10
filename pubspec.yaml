@@ -1,0 +1,52 @@
+name: mahalli
+description: Offline-first POS, inventory, debt and profit app for small shops.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.1
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_bloc: ^8.1.6
+
+  equatable: ^2.0.5
+  get_it: ^7.7.0
+
+  isar_community: ^3.1.0
+  isar_community_flutter_libs: ^3.1.0
+  shared_preferences: ^2.3.2
+  path_provider: ^2.1.4
+  flutter_secure_storage: ^11.2.0
+  cryptography: ^2.9.0
+  mobile_scanner: ^7.4.2
+  pdf: ^3.11.1
+  printing: ^5.13.4
+  crypto: ^3.0.6
+  file_picker: ^13.1.0
+  archive: ^3.6.1
+  share_plus: ^13.3.1
+
+  logger: ^2.4.0
+
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.11
+  isar_community_generator: ^3.1.0
+  bloc_test: ^9.1.7
+  mocktail: ^1.0.4
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  # fonts:
